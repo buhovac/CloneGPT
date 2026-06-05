@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
  */
 class SimpleAskService
 {
-    public const DEFAULT_MODEL = 'openai/gpt-5-mini';
+    public const DEFAULT_MODEL = 'openai/gpt-4o-mini';
 
     private string $apiKey;
     private string $baseUrl;
@@ -91,6 +91,7 @@ class SimpleAskService
                 'model' => $model,
                 'messages' => $messages,
                 'temperature' => $temperature,
+                'max_tokens' => 1024,
             ])
         ;
 
@@ -100,7 +101,11 @@ class SimpleAskService
             throw new \RuntimeException("Erreur API: {$error}");
         }
 
-        return $response->json('choices.0.message.content', '');
+        // Neki modeli (Mistral, DeepSeek...) mogu vratiti null u content
+        $content = $response->json('choices.0.message.content');
+        $content ??= $response->json('choices.0.message.reasoning', '');
+
+        return (string) $content;
     }
 
     /**

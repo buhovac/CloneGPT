@@ -115,14 +115,17 @@ class SimpleAskService
      */
     private function getSystemPrompt(): array
     {
-        $user = auth()->user()?->name ?? 'l\'utilisateur';
-        $now = now()->locale('fr')->format('l d F Y H:i');
+        $user = auth()->user();
+        $now  = now()->locale('fr')->format('l d F Y H:i');
 
         return [
-            'role' => 'system',
+            'role'    => 'system',
             'content' => view('prompts.system', [
-                'now' => $now,
-                'user' => $user,
+                'now'             => $now,
+                'user'            => $user?->name ?? 'l\'utilisateur',
+                'custom_about'    => $user?->custom_about,
+                'custom_behavior' => $user?->custom_behavior,
+                'custom_commands' => $user?->custom_commands,
             ])->render(),
         ];
     }

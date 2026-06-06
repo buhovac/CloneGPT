@@ -20,7 +20,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Authenticatable implements PasskeyUser
 {
     protected $fillable = [
-        'name', 'email', 'password', 'preferred_model',
+        'name',
+        'email',
+        'password',
+        'preferred_model',
+        'custom_about',
+        'custom_behavior',
+        'custom_commands',
     ];
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;

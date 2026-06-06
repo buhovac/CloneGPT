@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted, shallowRef } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import type MarkdownItType from 'markdown-it';
+import { ref, nextTick, watch, onMounted, shallowRef } from 'vue';
+import { show, store, model as modelRoute } from '@/routes/chat';
+import { store as messagesStore } from '@/routes/chat/messages';
+
 
 interface Model {
     id: string;
@@ -84,36 +87,33 @@ watch(() => props.activeConversation?.messages?.length, scrollToBottom, {
 });
 
 // Nova konverzacija
-const createConversation = () => {
-    newConversationForm.post(route('chat.store'));
-};
+function createConversation() {
+    newConversationForm.post(store().url);
+}
 
 // Slanje poruke
-const sendMessage = () => {
+function sendMessage() {
     if (!messageForm.content.trim() || !props.activeConversation) {
         return;
     }
 
-    messageForm.post(
-        route('chat.messages.store', props.activeConversation.id),
-        {
-            onSuccess: () => {
-                messageForm.reset('content');
-            },
+    messageForm.post(messagesStore(props.activeConversation.id).url, {
+        onSuccess: () => {
+            messageForm.reset('content');
         },
-    );
-};
+    });
+}
 
 // Promjena modela
-const updateModel = () => {
+function updateModel() {
     if (!props.activeConversation) {
         newConversationForm.model = modelForm.model;
 
         return;
     }
 
-    modelForm.patch(route('chat.model', props.activeConversation.id));
-};
+    modelForm.patch(modelRoute(props.activeConversation.id).url);
+}
 </script>
 
 <template>
@@ -153,7 +153,7 @@ const updateModel = () => {
                 <a
                     v-for="conv in props.conversations"
                     :key="conv.id"
-                    :href="route('chat.show', conv.id)"
+                    :href="show(conv.id).url"
                     class="block truncate rounded-md px-3 py-2 text-sm transition"
                     :class="
                         props.activeConversation?.id === conv.id
@@ -224,12 +224,10 @@ const updateModel = () => {
                                     : 'border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
                             "
                         >
-                            <!-- User poruke kao plain text -->
                             <template v-if="msg.role === 'user'">
                                 {{ msg.content }}
                             </template>
 
-                            <!-- Assistant poruke sa Markdown -->
                             <div
                                 v-else
                                 class="prose prose-sm max-w-none dark:prose-invert"

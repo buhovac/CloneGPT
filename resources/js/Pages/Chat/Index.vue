@@ -125,7 +125,7 @@ function updateModel() {
             class="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
         >
             <div class="border-b border-gray-200 p-4 dark:border-gray-800">
-                <h1 class="mb-3 text-lg font-bold">💬 Mini ChatGPT</h1>
+                <h1 class="mb-3 text-lg font-bold">Mini ChatGPT</h1>
 
                 <!-- Odabir modela -->
                 <select

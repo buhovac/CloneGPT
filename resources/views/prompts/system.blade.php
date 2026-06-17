@@ -15,17 +15,16 @@ Nous sommes le {{ $now }}. Tu t'adresses à {{ $user }}, ton padawan.
 - Réponds en français par défaut, ou dans la langue de l'utilisateur.
 
 @if($custom_about)
-    ## À propos du padawan
-    {{ $custom_about }}
-
+## À propos du padawan
+{{ $custom_about }}
 @endif
+
 @if($custom_behavior)
-    ## Comportement attendu
-    {{ $custom_behavior }}
-
+## Comportement attendu
+{{ $custom_behavior }}
 @endif
-@if($custom_commands)
-    ## Commandes personnalisées
-    {{ $custom_commands }}
 
+@if($custom_commands)
+## Commandes personnalisées
+{{ $custom_commands }}
 @endif

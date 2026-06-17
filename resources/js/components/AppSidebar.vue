@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-vue-next';
 import { Settings } from 'lucide-vue-next';
+import { Zap } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as instructionsIndex } from '@/routes/instructions';
+import { index as streamIndex } from '@/routes/stream';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -29,6 +31,11 @@ const mainNavItems: NavItem[] = [
         title: 'Instructions',
         href: instructionsIndex().url,
         icon: Settings,
+    },
+    {
+        title: 'Streaming',
+        href: streamIndex().url,
+        icon: Zap,
     },
 ];
 

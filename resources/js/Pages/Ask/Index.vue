@@ -73,7 +73,7 @@ const submit = () => {
                         <select
                             id="model"
                             v-model="form.model"
-                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand dark:border-gray-700 dark:bg-gray-800"
                         >
                             <option
                                 v-for="model in props.models"
@@ -97,7 +97,7 @@ const submit = () => {
                             v-model="form.message"
                             rows="4"
                             placeholder="Envoyez un message pour démarrer une conversation..."
-                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand/80 focus:ring-brand/80 dark:border-gray-700 dark:bg-gray-800"
                             :disabled="form.processing"
                         ></textarea>
                     </div>
@@ -106,7 +106,7 @@ const submit = () => {
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out hover:bg-indigo-700 focus:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none active:bg-indigo-900 disabled:opacity-50"
+                            class="inline-flex items-center rounded-md border border-transparent bg-brand px-4 py-2 text-xs font-semibold tracking-widest text-surface uppercase transition duration-150 ease-in-out hover:bg-brand/80 focus:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none active:bg-indigo-900 disabled:opacity-50"
                         >
                             {{ form.processing ? 'Chargement...' : 'Envoyer' }}
                         </button>

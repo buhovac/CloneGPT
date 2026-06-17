@@ -127,14 +127,14 @@
 }
 
 .dark {
-    --background: hsl(0 0% 3.9%);
+    --background: #353535;
     --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
+    --card: #3d3d3d;
     --card-foreground: hsl(0 0% 98%);
     --popover: hsl(0 0% 3.9%);
     --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
+    --primary: #beef35;
+    --primary-foreground: #353535;
     --secondary: hsl(0 0% 14.9%);
     --secondary-foreground: hsl(0 0% 98%);
     --muted: hsl(0 0% 16.08%);
@@ -145,7 +145,7 @@
     --destructive-foreground: hsl(0 0% 98%);
     --border: hsl(0 0% 14.9%);
     --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
+    --ring: #beef35;
     --chart-1: hsl(220 70% 50%);
     --chart-2: hsl(160 60% 45%);
     --chart-3: hsl(30 80% 55%);
@@ -169,4 +169,9 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+/* YC - theme */
+@theme {
+    --color-brand: #beef35;
+    --color-surface: #353535;
 }

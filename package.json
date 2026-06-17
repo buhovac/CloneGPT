@@ -38,6 +38,7 @@
         "@inertiajs/vite": "^3.0.0",
         "@inertiajs/vue3": "^3.0.0",
         "@laravel/passkeys": "^0.2.0",
+        "@laravel/stream-vue": "^0.3.13",
         "@tailwindcss/typography": "^0.5.19",
         "@vueuse/core": "^12.8.2",
         "class-variance-authority": "^0.7.1",

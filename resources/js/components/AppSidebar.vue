@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-vue-next';
-import { Settings } from 'lucide-vue-next';
-import { Zap } from 'lucide-vue-next';
+import {
+    BookOpen,
+    FolderGit2,
+    MessageSquare,
+    Settings,
+} from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -16,33 +19,27 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { index as chatIndex } from '@/routes/chat';
 import { index as instructionsIndex } from '@/routes/instructions';
-import { index as streamIndex } from '@/routes/stream';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Chat',
+        href: chatIndex().url,
+        icon: MessageSquare,
     },
     {
         title: 'Instructions',
         href: instructionsIndex().url,
         icon: Settings,
     },
-    {
-        title: 'Streaming',
-        href: streamIndex().url,
-        icon: Zap,
-    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
+        href: 'https://github.com/buhovac/CloneGPT',
         icon: FolderGit2,
     },
     {
@@ -59,7 +56,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="chatIndex().url">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

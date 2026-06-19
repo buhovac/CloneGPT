@@ -90,7 +90,7 @@ function save() {
                     v-model="form.custom_commands"
                     rows="4"
                     placeholder="/debug → Analyse ce code et trouve les bugs potentiels.&#10;/eli5 → Explique ce concept simplement, avec une analogie."
-                    class="w-full resize-none px-5 py-5 rounded-xl border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800"
+                    class="w-full resize-none px-5 py-5 rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand dark:border-gray-700 dark:bg-gray-800"
                 />
                 <p class="mt-1 text-right text-xs text-gray-400">
                     {{ form.custom_commands.length }} / 2000
@@ -108,7 +108,7 @@ function save() {
                 <button
                     type="submit"
                     :disabled="form.processing || !form.isDirty"
-                    class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-40"
+                    class="rounded-xl bg-brand px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand/80 disabled:opacity-40"
                 >
                     Sauvegarder
                 </button>

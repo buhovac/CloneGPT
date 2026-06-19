@@ -5,6 +5,8 @@ import type MarkdownItType from 'markdown-it';
 import { ref, nextTick, watch, onMounted, shallowRef, computed } from 'vue';
 import { show, store, model as modelRoute } from '@/routes/chat';
 import { stream as messagesStream } from '@/routes/chat/messages';
+import { store as tagsStore } from '@/routes/tags';
+import { attach as tagsAttach, detach as tagsDetach } from '@/routes/tags';
 
 interface Model {
     id: string;
@@ -17,12 +19,19 @@ interface Message {
     content: string;
 }
 
+interface Tag {
+    id: number;
+    name: string;
+    color: string;
+}
+
 interface Conversation {
     id: number;
     title: string;
     model: string;
     updated_at: string;
     messages?: Message[];
+    tags?: Tag[];
 }
 
 const props = defineProps<{
@@ -30,6 +39,7 @@ const props = defineProps<{
     models: Model[];
     defaultModel: string;
     activeConversation?: Conversation;
+    allTags: Tag[];
 }>();
 
 // Markdown — lazy init pour SSR
@@ -66,6 +76,7 @@ const renderMarkdown = (content: string): string => {
 
 // Forms
 const messageContent = ref('');
+const temperature = ref(1.0);
 const modelForm = useForm({
     model: props.activeConversation?.model ?? props.defaultModel,
 });
@@ -128,7 +139,7 @@ function sendMessage() {
         return;
     }
 
-    send({ content: messageContent.value });
+    send({ content: messageContent.value, temperature: temperature.value });
 }
 
 // Promjena modela
@@ -142,6 +153,62 @@ function updateModel() {
     modelForm.patch(modelRoute(props.activeConversation.id).url);
 }
 
+// ─── Tags ───
+const newTagName = ref('');
+const tagForm = useForm({ name: '', color: '#beef35' });
+
+function createTag() {
+    if (!newTagName.value.trim()) {
+        return;
+    }
+
+    tagForm.name = newTagName.value;
+    tagForm.post(tagsStore().url, {
+        preserveScroll: true,
+        onSuccess: () => {
+            newTagName.value = '';
+            tagForm.reset();
+        },
+    });
+}
+
+function attachTag(tagId: number) {
+    if (!props.activeConversation) {
+        return;
+    }
+
+    router.post(
+        tagsAttach(props.activeConversation.id).url,
+        { tag_id: tagId },
+        { preserveScroll: true, only: ['activeConversation', 'conversations'] },
+    );
+}
+
+function detachTag(tagId: number) {
+    if (!props.activeConversation) {
+        return;
+    }
+
+    router.delete(
+        tagsDetach({ conversation: props.activeConversation.id, tag: tagId })
+            .url,
+        {
+            preserveScroll: true,
+            only: ['activeConversation', 'conversations'],
+        },
+    );
+}
+
+// Tagovi koji JOŠ NISU na aktivnoj konverzaciji (za dropdown)
+const availableTags = computed(() => {
+    if (!props.activeConversation) {
+        return props.allTags;
+    }
+
+    const activeIds = (props.activeConversation.tags ?? []).map((t) => t.id);
+
+    return props.allTags.filter((t) => !activeIds.includes(t.id));
+});
 function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -170,6 +237,25 @@ function handleKeydown(e: KeyboardEvent) {
                         {{ m.name }}
                     </option>
                 </select>
+                <!-- Température -->
+                <div class="mb-3">
+                    <label
+                        class="mb-1 flex items-center justify-between text-xs text-gray-400"
+                    >
+                        <span>Température</span>
+                        <span class="font-mono text-brand">{{
+                            temperature.toFixed(1)
+                        }}</span>
+                    </label>
+                    <input
+                        v-model.number="temperature"
+                        type="range"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        class="w-full accent-brand"
+                    />
+                </div>
 
                 <button
                     :disabled="newConversationForm.processing"
@@ -185,14 +271,31 @@ function handleKeydown(e: KeyboardEvent) {
                     v-for="conv in props.conversations"
                     :key="conv.id"
                     :href="show(conv.id).url"
-                    class="block truncate rounded-md px-3 py-2 text-sm transition"
+                    class="block rounded-md px-3 py-2 text-sm transition"
                     :class="
                         props.activeConversation?.id === conv.id
-                            ? 'bg-indigo-100 font-semibold text-surface dark:bg-brand/20 dark:text-brand'
+                            ? 'bg-brand/15 font-semibold text-surface dark:bg-brand/20 dark:text-brand'
                             : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                     "
                 >
-                    {{ conv.title }}
+                    <span class="block truncate">{{ conv.title }}</span>
+                    <span
+                        v-if="conv.tags?.length"
+                        class="mt-1 flex flex-wrap gap-1"
+                    >
+                        <span
+                            v-for="tag in conv.tags"
+                            :key="tag.id"
+                            class="rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                            :style="{
+                                backgroundColor: tag.color + '33',
+                                color: tag.color,
+                            }"
+                            v-if="props.activeConversation"
+                        >
+                            {{ tag.name }}
+                        </span>
+                    </span>
                 </a>
 
                 <p
@@ -222,6 +325,67 @@ function handleKeydown(e: KeyboardEvent) {
                 >
                     Modèle : {{ props.activeConversation.model }}
                 </p>
+                <!-- Tag manager -->
+                <div
+                    v-if="props.activeConversation"
+                    class="mt-2 flex flex-wrap items-center gap-2"
+                >
+                    <!-- Tagovi na konverzaciji -->
+                    <span
+                        v-for="tag in props.activeConversation.tags"
+                        :key="tag.id"
+                        class="group flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+                        :style="{
+                            backgroundColor: tag.color + '33',
+                            color: tag.color,
+                        }"
+                    >
+                        {{ tag.name }}
+                        <button
+                            class="opacity-50 transition hover:opacity-100"
+                            title="Retirer"
+                            @click="detachTag(tag.id)"
+                        >
+                            ✕
+                        </button>
+                    </span>
+
+                    <!-- Dropdown za dodavanje postojećeg taga -->
+                    <select
+                        v-if="availableTags.length"
+                        class="rounded-full border-gray-300 bg-transparent py-0.5 pr-7 pl-2 text-xs dark:border-gray-700"
+                        @change="
+                            attachTag(
+                                Number(
+                                    ($event.target as HTMLSelectElement).value,
+                                ),
+                            );
+                            ($event.target as HTMLSelectElement).value = '';
+                        "
+                    >
+                        <option value="" disabled selected>+ Tag</option>
+                        <option
+                            v-for="tag in availableTags"
+                            :key="tag.id"
+                            :value="tag.id"
+                        >
+                            {{ tag.name }}
+                        </option>
+                    </select>
+
+                    <!-- Kreiranje novog taga -->
+                    <form
+                        class="flex items-center gap-1"
+                        @submit.prevent="createTag"
+                    >
+                        <input
+                            v-model="newTagName"
+                            type="text"
+                            placeholder="Nouveau tag"
+                            class="w-24 rounded-full border-gray-300 bg-transparent px-2 py-0.5 text-xs dark:border-gray-700"
+                        />
+                    </form>
+                </div>
             </header>
 
             <!-- Poruke -->

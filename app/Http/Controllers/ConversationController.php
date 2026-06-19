@@ -15,6 +15,7 @@ class ConversationController extends Controller
     {
         $conversations = auth()->user()
             ->conversations()
+            ->with('tags')
             ->orderByDesc('updated_at')
             ->get(['id', 'title', 'model', 'updated_at']);
 
@@ -22,6 +23,7 @@ class ConversationController extends Controller
             'conversations' => $conversations,
             'models' => $this->askService->getModels(),
             'defaultModel' => auth()->user()->preferred_model ?? SimpleAskService::DEFAULT_MODEL,
+            'allTags' => auth()->user()->tags()->orderBy('name')->get(),
         ]);
     }
 
@@ -32,6 +34,7 @@ class ConversationController extends Controller
 
         $conversations = auth()->user()
             ->conversations()
+            ->with('tags')
             ->orderByDesc('updated_at')
             ->get(['id', 'title', 'model', 'updated_at']);
 
@@ -39,7 +42,8 @@ class ConversationController extends Controller
             'conversations' => $conversations,
             'models' => $this->askService->getModels(),
             'defaultModel' => auth()->user()->preferred_model ?? SimpleAskService::DEFAULT_MODEL,
-            'activeConversation' => $conversation->load('messages'),
+            'activeConversation' => $conversation->load('messages', 'tags'),
+            'allTags' => auth()->user()->tags()->orderBy('name')->get(),
         ]);
     }
 

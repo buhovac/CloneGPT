@@ -19,7 +19,10 @@ class MessageController extends Controller
     {
         abort_unless($conversation->user_id === auth()->id(), 403);
 
-        $request->validate(['content' => 'required|string']);
+        $validated = $request->validate([
+            'content'     => 'required|string',
+            'temperature' => 'nullable|numeric|min:0|max:2',
+        ]);
 
         $conversation->messages()->create([
             'role' => 'user',
@@ -84,6 +87,7 @@ class MessageController extends Controller
                 $fullResponse = $this->streamService->streamAndCollect(
                     messages: $history,
                     model: $conversation->model,
+                    temperature: (float) ($validated['temperature'] ?? 1.0),
                 );
 
                 // 4. Spremi assistant odgovor — ukloni reasoning markere

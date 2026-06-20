@@ -64,15 +64,18 @@ class MessageController extends Controller
     {
         abort_unless($conversation->user_id === auth()->id(), 403);
 
-        $request->validate(['content' => 'required|string']);
+        $validated = $request->validate([
+            'content'     => 'required|string',
+            'temperature' => 'nullable|numeric|min:0|max:2',
+        ]);
 
-        // 1. Spremi user poruku odmah
+        // 1. Enregistrer le message de l'utilisateur maintenant
         $conversation->messages()->create([
             'role'    => 'user',
             'content' => $request->content,
         ]);
 
-        // 2. Pripremi historiju (context window)
+        // 2. Préparer l'historique (fenêtre de contexte)
         $history = $conversation->messages()
             ->orderBy('id')
             ->get()
@@ -82,15 +85,15 @@ class MessageController extends Controller
         $userContent = $request->content;
 
         return response()->stream(
-            function () use ($history, $conversation, $userContent): void {
-                // 3. Streami prema klijentu i skupljaj odgovor
+            function () use ($history, $conversation, $userContent, $validated): void {
+                // 3. Diffuser le flux vers le client et recueillir les réponses
                 $fullResponse = $this->streamService->streamAndCollect(
                     messages: $history,
                     model: $conversation->model,
                     temperature: (float) ($validated['temperature'] ?? 1.0),
                 );
 
-                // 4. Spremi assistant odgovor — ukloni reasoning markere
+                // 4. Enregistrer la réponse de l'assistant — supprimer les marqueurs de raisonnement
                 $cleanResponse = trim(preg_replace(
                     '/\[REASONING][\s\S]*?\[\/REASONING]/',
                     '',
@@ -102,7 +105,7 @@ class MessageController extends Controller
                     'content' => $cleanResponse ?: $fullResponse,
                 ]);
 
-                // 5. Auto-title na prvoj poruci
+                // 5. Titre automatique sur le premier message
                 $messageCount = $conversation->messages()->count();
                 if ($messageCount === 2 && $conversation->title === 'Nouvelle conversation') {
                     $titleResponse = $this->askService->sendMessage(
@@ -115,7 +118,7 @@ class MessageController extends Controller
                     $conversation->update(['title' => trim($titleResponse)]);
                 }
 
-                // 6. touch() za sortiranje
+                // 6. touch() pour le tri
                 $conversation->touch();
             },
             headers: [

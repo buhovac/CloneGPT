@@ -82,7 +82,7 @@ const modelForm = useForm({
 });
 const newConversationForm = useForm({ model: props.defaultModel });
 
-// URL za useStream — fallback na prazan string kad nema konverzacije
+// URL pour useStream — chaîne vide par défaut en l'absence de conversation
 const streamUrl = computed(() =>
     props.activeConversation
         ? messagesStream(props.activeConversation.id).url
@@ -100,7 +100,7 @@ const { data, isFetching, isStreaming, send } = useStream(streamUrl, {
     },
 });
 
-// Streaming state — ukloni reasoning markere
+// État de flux — suppression des marqueurs de raisonnement
 const streamingContent = computed(() => {
     if (!data.value) {
         return '';
@@ -124,12 +124,12 @@ watch(() => props.activeConversation?.messages?.length, scrollToBottom, {
 
 watch(streamingContent, scrollToBottom);
 
-// Nova konverzacija
+// Nouvelle conversation
 function createConversation() {
     newConversationForm.post(store().url);
 }
 
-// Slanje poruke via stream
+// Envoi d'un message via flux
 function sendMessage() {
     if (
         !messageContent.value.trim() ||
@@ -142,7 +142,7 @@ function sendMessage() {
     send({ content: messageContent.value, temperature: temperature.value });
 }
 
-// Promjena modela
+// Modèle de changement
 function updateModel() {
     if (!props.activeConversation) {
         newConversationForm.model = modelForm.model;
@@ -199,7 +199,7 @@ function detachTag(tagId: number) {
     );
 }
 
-// Tagovi koji JOŠ NISU na aktivnoj konverzaciji (za dropdown)
+// Étiquettes qui ne font PAS ENCORE partie d'une conversation active (pour le menu déroulant)
 const availableTags = computed(() => {
     if (!props.activeConversation) {
         return props.allTags;
@@ -330,7 +330,7 @@ function handleKeydown(e: KeyboardEvent) {
                     v-if="props.activeConversation"
                     class="mt-2 flex flex-wrap items-center gap-2"
                 >
-                    <!-- Tagovi na konverzaciji -->
+                    <!-- Étiquettes de conversation -->
                     <span
                         v-for="tag in props.activeConversation.tags"
                         :key="tag.id"
@@ -350,7 +350,7 @@ function handleKeydown(e: KeyboardEvent) {
                         </button>
                     </span>
 
-                    <!-- Dropdown za dodavanje postojećeg taga -->
+                    <!-- Menu déroulant pour ajouter une étiquette existante -->
                     <select
                         v-if="availableTags.length"
                         class="rounded-full border-gray-300 bg-transparent py-0.5 pr-7 pl-2 text-xs dark:border-gray-700"
@@ -373,7 +373,7 @@ function handleKeydown(e: KeyboardEvent) {
                         </option>
                     </select>
 
-                    <!-- Kreiranje novog taga -->
+                    <!-- Création d'une nouvelle balise -->
                     <form
                         class="flex items-center gap-1"
                         @submit.prevent="createTag"
@@ -388,7 +388,7 @@ function handleKeydown(e: KeyboardEvent) {
                 </div>
             </header>
 
-            <!-- Poruke -->
+            <!-- Messages -->
             <div class="flex-1 space-y-4 overflow-y-auto px-6 py-4">
                 <div
                     v-if="!props.activeConversation"
@@ -401,7 +401,7 @@ function handleKeydown(e: KeyboardEvent) {
                 </div>
 
                 <template v-else>
-                    <!-- Postojeće poruke iz baze -->
+                    <!-- Messages existants de la base de données -->
                     <div
                         v-for="msg in props.activeConversation.messages"
                         :key="msg.id"
@@ -432,7 +432,7 @@ function handleKeydown(e: KeyboardEvent) {
                         </div>
                     </div>
 
-                    <!-- Optimistic UI — user poruka dok stream čeka -->
+                    <!-- Interface utilisateur optimiste — message à l'utilisateur pendant l'attente du flux -->
                     <div
                         v-if="isLoading && messageContent"
                         class="flex justify-end"
@@ -444,7 +444,7 @@ function handleKeydown(e: KeyboardEvent) {
                         </div>
                     </div>
 
-                    <!-- Streaming odgovor -->
+                    <!-- Réponse en continu -->
                     <div
                         v-if="isLoading || streamingContent"
                         class="flex justify-start"
@@ -452,7 +452,7 @@ function handleKeydown(e: KeyboardEvent) {
                         <div
                             class="max-w-[75%] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-gray-700 dark:bg-gray-800"
                         >
-                            <!-- Loader dok čekamo prvi chunk -->
+                            <!-- Chargement en cours pendant l'attente du premier morceau -->
                             <div
                                 v-if="isFetching && !streamingContent"
                                 class="flex items-center gap-2 text-gray-500"
@@ -470,7 +470,7 @@ function handleKeydown(e: KeyboardEvent) {
                                 >
                             </div>
 
-                            <!-- Streaming tekst -->
+                            <!-- Texte en continu -->
                             <div
                                 v-if="streamingContent"
                                 class="prose prose-sm max-w-none dark:prose-invert"

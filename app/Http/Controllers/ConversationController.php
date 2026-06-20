@@ -29,7 +29,7 @@ class ConversationController extends Controller
 
     public function show(Conversation $conversation)
     {
-        // Provjera da konverzacija pripada korisniku
+        // Vérifier que la conversation appartient à l'utilisateur
         abort_unless($conversation->user_id === auth()->id(), 403);
 
         $conversations = auth()->user()
@@ -53,7 +53,7 @@ class ConversationController extends Controller
 
         $model = $request->model;
 
-        // Spremi preferred_model za korisnika
+        // Enregistrer le modèle préféré pour l'utilisateur
         auth()->user()->update(['preferred_model' => $model]);
 
         $conversation = auth()->user()->conversations()->create([
@@ -72,7 +72,7 @@ class ConversationController extends Controller
 
         $model = $request->model;
 
-        // Spremi u users tabelu I u conversations tabelu
+        // Enregistrez dans la table des utilisateurs et dans la table des conversations
         auth()->user()->update(['preferred_model' => $model]);
         $conversation->update(['model' => $model]);
 

@@ -83,10 +83,8 @@ const modelForm = useForm({
 const newConversationForm = useForm({ model: props.defaultModel });
 
 // URL pour useStream — chaîne vide par défaut en l'absence de conversation
-const streamUrl = computed(() =>
-    props.activeConversation
-        ? messagesStream(props.activeConversation.id).url
-        : '',
+const streamUrl = computed(
+    () => messagesStream(props.activeConversation?.id ?? 0).url,
 );
 
 // useStream hook
@@ -291,7 +289,6 @@ function handleKeydown(e: KeyboardEvent) {
                                 backgroundColor: tag.color + '33',
                                 color: tag.color,
                             }"
-                            v-if="props.activeConversation"
                         >
                             {{ tag.name }}
                         </span>

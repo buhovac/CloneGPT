@@ -90,8 +90,8 @@ const streamUrl = computed(
 // useStream hook
 const { data, isFetching, isStreaming, send } = useStream(streamUrl, {
     onFinish: () => {
-        router.reload({ only: ['activeConversation', 'conversations'] });
         messageContent.value = '';
+        router.reload({ only: ['activeConversation', 'conversations'] });
     },
     onError: (err: Error) => {
         console.error('Streaming error:', err);
@@ -124,7 +124,18 @@ watch(streamingContent, scrollToBottom);
 
 // Nouvelle conversation
 function createConversation() {
-    newConversationForm.post(store().url);
+    router.post(
+        store().url,
+        { model: newConversationForm.model },
+        {
+            onSuccess: (page) => {
+                // Inertia ne remonte pas le composant, donc useStream
+                // garderait l'ancienne URL (/chat/0/stream). window.location
+                // force la réinitialisation avec le bon ID de conversation.
+                window.location.href = page.url;
+            },
+        },
+    );
 }
 
 // Envoi d'un message via flux
@@ -443,7 +454,7 @@ function handleKeydown(e: KeyboardEvent) {
 
                     <!-- Réponse en continu -->
                     <div
-                        v-if="isLoading || streamingContent"
+                        v-if="isFetching || isStreaming"
                         class="flex justify-start"
                     >
                         <div
